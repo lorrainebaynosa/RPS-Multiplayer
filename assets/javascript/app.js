@@ -115,51 +115,54 @@ database.ref().on("child_added", function(childSnapshot, prevChildKey) {
     console.log("first train snapshot " + firstTrainTime);
     console.log(frequency);
   
-    // CALCULATE NEXT ARRIVAL AND MINUTES AWAY
-    // var tFrequency = 5;
+var frequency = childSnapshot.val().often;
+var firstTrainTime = childSnapshot.val().time;
 
-    // Time is 00:00 AM
-    // var firstTime = "00:00";
+// First Time (pushed back 1 year to make sure it comes before current time)
+var firstTrainTimeConverted = moment(firstTrainTime, "hh:mm").subtract(1, "years");
+console.log(firstTrainTimeConverted);
 
-    // First Train Time
-    // var firstTimeConverted = moment(firstTrainTime, "HH:mm").subtract(1, "years");
-    // console.log(firstTimeConverted);
-    
-    var timeArr = firstTrainTime.split(':');
-    console.log("time array " + timeArr)
-    var trainTConver = moment().hours(timeArr[0]).minutes(timeArr[1]);
+// Current Time
+var currentTime = moment();
+console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
 
-    var maxTime = moment.max(moment(), trainTConver);
+// Difference between the times
+var diffTime = moment().diff(moment(firstTrainTimeConverted), "minutes");
+console.log("DIFFERENCE IN TIME: " + diffTime);
 
-    if (maxTime === trainTConver) {
-        $("<td>").text(nextTrain),
-        $("<td>").text(tMinutesTillTrain)
+// Time apart (remainder)
+var tRemainder = diffTime % frequency;
+console.log(tRemainder);
 
-        var nextTrain = trainTConver.format("hh:mm A");
-        var tMinutesTillTrain = trainTConver.diff(moment(), "minutes");
-        
-    }
-else{
-    // Current Time
-    var currentTime = moment();
-    console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
+// Minute Until Train
+var tMinutesTillTrain = frequency - tRemainder;
+console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
 
-    // Difference between the times
-    var diffTime = moment().diff(trainTConver, "minutes");
-    console.log("DIFFERENCE IN TIME: " + diffTime);
+// Next Train
+var nextTrain = moment().add(tMinutesTillTrain, "minutes");
+console.log("ARRIVAL TIME: " + moment(nextTrain).format("hh:mm"));
 
-    // Time apart (remainder)
-    var tRemainder = diffTime % frequency;
-    console.log("remainder " + tRemainder);
 
-    // Minute Until Train
-    var tMinutesTillTrain = frequency - tRemainder;
-    console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+    // // Current Time
+    // var currentTime = moment();
+    // console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
 
-    // Next Train
-    var nextTrain = moment().add(tMinutesTillTrain, "minutes").format("hh:mm A");
-    console.log("ARRIVAL TIME: " + nextTrain);
-}
+    // // Difference between the times
+    // var diffTime = moment().diff(trainTConver, "minutes");
+    // console.log("DIFFERENCE IN TIME: " + diffTime);
+
+    // // Time apart (remainder)
+    // var tRemainder = diffTime % frequency;
+    // console.log("remainder " + tRemainder);
+
+    // // Minute Until Train
+    // var tMinutesTillTrain = frequency - tRemainder;
+    // console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+
+    // // Next Train
+    // var nextTrain = moment().add(tMinutesTillTrain, "minutes").format("hh:mm A");
+    // console.log("ARRIVAL TIME: " + nextTrain);
+
     // Create the new row
     var newRow = $("<tr>").append(
       $("<td>").text(trainName),
