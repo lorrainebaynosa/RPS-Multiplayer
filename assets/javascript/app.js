@@ -30,7 +30,7 @@ $("#add-train-btn").on("click", function(event) {
 
 var trainName = $("#train-name-input").val().trim();
 var destination = $("#destination-input").val().trim();
-var firstTrainTime = moment($("#first-train-time-input").val().trim(), "HH:mm").format("X");
+var firstTrainTime = $("#first-train-time-input").val().trim();
 //  use moment.js to get military time
 var frequency = $("#frequency-input").val().trim();
 // CLEAR VALUE OF INPUT TEXT BOXES AFTER SUBMISSION using jQuery .val("") method
@@ -112,7 +112,7 @@ database.ref().on("child_added", function(childSnapshot, prevChildKey) {
     // Employee Info
     console.log(trainName);
     console.log(destination);
-    console.log(firstTrainTime);
+    console.log("first train snapshot " + firstTrainTime);
     console.log(frequency);
   
     // CALCULATE NEXT ARRIVAL AND MINUTES AWAY
@@ -122,29 +122,44 @@ database.ref().on("child_added", function(childSnapshot, prevChildKey) {
     // var firstTime = "00:00";
 
     // First Train Time
-    var firstTimeConverted = moment(firstTrainTime, "HH:mm").subtract(1, "years");
-    console.log(firstTimeConverted);
+    // var firstTimeConverted = moment(firstTrainTime, "HH:mm").subtract(1, "years");
+    // console.log(firstTimeConverted);
+    
+    var timeArr = firstTrainTime.split(':');
+    console.log("time array " + timeArr)
+    var trainTConver = moment().hours(timeArr[0]).minutes(timeArr[1]);
 
+    var maxTime = moment.max(moment(), trainTConver);
+
+    if (maxTime === trainTConver) {
+        $("<td>").text(nextTrain),
+        $("<td>").text(tMinutesTillTrain)
+
+        var nextTrain = trainTConver.format("hh:mm A");
+        var tMinutesTillTrain = trainTConver.diff(moment(), "minutes");
+        
+    }
+else{
     // Current Time
     var currentTime = moment();
     console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
 
     // Difference between the times
-    var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+    var diffTime = moment().diff(trainTConver, "minutes");
     console.log("DIFFERENCE IN TIME: " + diffTime);
 
     // Time apart (remainder)
     var tRemainder = diffTime % frequency;
-    console.log(tRemainder);
+    console.log("remainder " + tRemainder);
 
     // Minute Until Train
     var tMinutesTillTrain = frequency - tRemainder;
     console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
 
     // Next Train
-    var nextTrain = moment().add(tMinutesTillTrain, "minutes");
-    console.log("ARRIVAL TIME: " + moment(nextTrain).format("hh:mm"));
-  
+    var nextTrain = moment().add(tMinutesTillTrain, "minutes").format("hh:mm A");
+    console.log("ARRIVAL TIME: " + nextTrain);
+}
     // Create the new row
     var newRow = $("<tr>").append(
       $("<td>").text(trainName),
@@ -156,25 +171,11 @@ database.ref().on("child_added", function(childSnapshot, prevChildKey) {
   
     // Append the new row to the table
     $("#train-table > tbody").append(newRow);
+
   });
 
 
 
-
-
-
-
-
-
-
-
-
-
-// TRANSLATION OF INPUT (train name, destination, frequency) TO CURRENT TRAIN SCHEDULE
-
-// FIREBASE
-    // set keys in Firebase equal to some variable used in webpage display
-    // set values in Firebase using .val() extracted from snapshots of key/value pair
 
 
   
