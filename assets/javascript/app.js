@@ -30,23 +30,24 @@ $("#add-train-btn").on("click", function(event) {
 
 var trainName = $("#train-name-input").val().trim();
 var destination = $("#destination-input").val().trim();
-// var firstTrainTime = moment($("#first-train-time").val().trim();
-//     //  ("MM/DD/YYYY").format("X"); use moment.js to get military time
+var firstTrainTime = moment($("#first-train-time-input").val().trim(), "HH:mm").format("X");
+//  use moment.js to get military time
 var frequency = $("#frequency-input").val().trim();
 // CLEAR VALUE OF INPUT TEXT BOXES AFTER SUBMISSION using jQuery .val("") method
 
 $("#train-name-input").val("");
 $("#destination-input").val("");
-$("#first-train-time").val("");
+$("#first-train-time-input").val("");
 $("#frequency-input").val("");
 // METHOD FOR CODE FOR WEBPAGE DISPLAY TO SYNCHRONIZE WITH FIREBASE DATABASE: CREATE OBJECT TO PUSH TO FIREBASE
 // FIREBASE: assign object key and value pairs for pushing to FIREBASE; eg: key is name: and value is trainName; values for keys in Firebase equal to value variable used in webpage display
 var newTrain = {
     name: trainName,
     endpoint: destination,
-    // time: firstTrainTime,
+    time: firstTrainTime,
     often: frequency
 }
+
 // Transfers/pushes data from newTrain object to FIREBASE REALTIME DATABASE
 // newTrain object is pushed to ROOT of FIREBASE database
 // Ways to Save Data
@@ -57,9 +58,10 @@ var newTrain = {
     database.ref().push(newTrain);
 
 // Verify pushing correct data to FIREBASE
+// REVIEW OF CONCEPTS (below): console for Firebase Database - not for webpage console
 console.log(newTrain.name);
 console.log(newTrain.endpoint);
-// console.log(newTrain.time);
+console.log(newTrain.time);
 console.log(newTrain.often);
 
 alert("Train successfully added.");
@@ -114,13 +116,13 @@ database.ref().on("child_added", function(childSnapshot, prevChildKey) {
     console.log(frequency);
   
     // CALCULATE NEXT ARRIVAL AND MINUTES AWAY
-    var tFrequency = 5;
+    // var tFrequency = 5;
 
     // Time is 00:00 AM
-    var firstTime = "00:00";
+    // var firstTime = "00:00";
 
-    // First Time (pushed back 1 year to make sure it comes before current time)
-    var firstTimeConverted = moment(firstTime, "HH:mm").subtract(1, "years");
+    // First Train Time
+    var firstTimeConverted = moment(firstTrainTime, "HH:mm").subtract(1, "years");
     console.log(firstTimeConverted);
 
     // Current Time
@@ -132,11 +134,11 @@ database.ref().on("child_added", function(childSnapshot, prevChildKey) {
     console.log("DIFFERENCE IN TIME: " + diffTime);
 
     // Time apart (remainder)
-    var tRemainder = diffTime % tFrequency;
+    var tRemainder = diffTime % frequency;
     console.log(tRemainder);
 
     // Minute Until Train
-    var tMinutesTillTrain = tFrequency - tRemainder;
+    var tMinutesTillTrain = frequency - tRemainder;
     console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
 
     // Next Train

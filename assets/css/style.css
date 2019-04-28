@@ -1,9 +1,9 @@
-#employee-table th,td {
+#employee-table th, td {
       display: inline-block;
       width: 16.575%
     }
 
-.jumbotron {
-    background-color: black; 
-    color: white"
+.jumbotron, .card-header {
+    background-color: primary; 
+    color: white
 }
